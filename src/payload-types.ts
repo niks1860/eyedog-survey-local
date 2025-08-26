@@ -72,6 +72,10 @@ export interface Config {
     media: Media;
     categories: Category;
     users: User;
+    surveys: Survey;
+    questions: Question;
+    participants: Participant;
+    responses: Response;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -88,6 +92,10 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    surveys: SurveysSelect<false> | SurveysSelect<true>;
+    questions: QuestionsSelect<false> | QuestionsSelect<true>;
+    participants: ParticipantsSelect<false> | ParticipantsSelect<true>;
+    responses: ResponsesSelect<false> | ResponsesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -736,6 +744,363 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "surveys".
+ */
+export interface Survey {
+  id: number;
+  /**
+   * Internal name for the survey (e.g., "Wayfinding Study Q3 2025")
+   */
+  title: string;
+  /**
+   * Detailed description of the survey purpose and content
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  slug?: string | null;
+  slugLock?: boolean | null;
+  /**
+   * General instructions displayed to participants before starting the survey
+   */
+  instructions: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Message displayed to participants upon completing the survey
+   */
+  thankYouMessage: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Default countdown duration in seconds before each question (1-10 seconds)
+   */
+  defaultCountdownSeconds: number;
+  /**
+   * Ordered list of questions for this survey
+   */
+  questions?: (number | Question)[] | null;
+  /**
+   * Current status of the survey
+   */
+  status: 'draft' | 'published' | 'archived';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "questions".
+ */
+export interface Question {
+  id: number;
+  /**
+   * Internal name for the question (e.g., "Q1 - Museum Entrance")
+   */
+  title: string;
+  /**
+   * Type of question - either image selection or form input
+   */
+  type: '4_image' | 'form';
+  /**
+   * Order of this question within a survey
+   */
+  order: number;
+  /**
+   * Optional instructions that override survey-level instructions
+   */
+  overrideInstructions?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Optional countdown duration that overrides survey default (1-10 seconds)
+   */
+  countdownSeconds?: number | null;
+  /**
+   * Four images for the question (only shown for 4_image type)
+   */
+  images?:
+    | {
+        /**
+         * Unique identifier for the image within the question (e.g., "image_a")
+         */
+        id: string;
+        /**
+         * Image file for this option
+         */
+        image: number | Media;
+        /**
+         * Optional label for internal identification
+         */
+        label?: string | null;
+      }[]
+    | null;
+  /**
+   * Form input elements for the question (only shown for form type)
+   */
+  formElements?:
+    | {
+        /**
+         * Type of form input element
+         */
+        type: 'text' | 'textarea' | 'boolean' | 'number' | 'email' | 'select' | 'checkbox' | 'radio';
+        /**
+         * Unique identifier for the input (e.g., "age", "comments")
+         */
+        name: string;
+        /**
+         * Display label for the user (e.g., "Your Age:")
+         */
+        label: string;
+        /**
+         * Optional placeholder text
+         */
+        placeholder?: string | null;
+        /**
+         * Optional default value for the input
+         */
+        defaultValue?: string | null;
+        /**
+         * Whether this field is required
+         */
+        required?: boolean | null;
+        /**
+         * Options for select, radio, or checkbox inputs
+         */
+        options?:
+          | {
+              label: string;
+              value: string;
+              id?: string | null;
+            }[]
+          | null;
+        /**
+         * Validation rules for this input
+         */
+        validation?: {
+          /**
+           * Minimum character length
+           */
+          minLength?: number | null;
+          /**
+           * Maximum character length
+           */
+          maxLength?: number | null;
+          /**
+           * Minimum value (for number inputs)
+           */
+          min?: number | null;
+          /**
+           * Maximum value (for number inputs)
+           */
+          max?: number | null;
+          /**
+           * Regex pattern for validation
+           */
+          pattern?: string | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Manage survey participants and their progress
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "participants".
+ */
+export interface Participant {
+  id: number;
+  /**
+   * Unique identifier for the participant (leave empty to auto-generate)
+   */
+  participantId: string;
+  /**
+   * Secure, unique token for generating access links
+   */
+  uniqueLinkToken: string;
+  /**
+   * Survey this participant is currently assigned to
+   */
+  currentSurvey?: (number | null) | Survey;
+  /**
+   * Last question completed by this participant (for pause/resume functionality)
+   */
+  lastCompletedQuestion?: (number | null) | Question;
+  /**
+   * Current status of the participant
+   */
+  status: 'new' | 'in_progress' | 'completed' | 'abandoned';
+  /**
+   * Arbitrary participant-specific data (e.g., age, gender, group ID)
+   */
+  metadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * When the participant first started the survey
+   */
+  startedAt?: string | null;
+  /**
+   * When the participant completed the survey
+   */
+  completedAt?: string | null;
+  /**
+   * Total time spent on the survey in milliseconds
+   */
+  totalTimeMs?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Survey response data with precise timing measurements
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "responses".
+ */
+export interface Response {
+  id: number;
+  /**
+   * Participant who provided this response
+   */
+  participant: number | Participant;
+  /**
+   * Survey this response belongs to
+   */
+  survey: number | Survey;
+  /**
+   * Question this response answers
+   */
+  question: number | Question;
+  /**
+   * Timestamp when question elements fully appeared to user (client-side captured)
+   */
+  questionDisplayedAt: string;
+  /**
+   * Duration from questionDisplayedAt to first image click (for 4_image type)
+   */
+  initialSelectionTimeMs?: number | null;
+  /**
+   * Duration from questionDisplayedAt to "Next" button click
+   */
+  finalSelectionTimeMs: number;
+  /**
+   * For 4_image type, the ID of the selected image (e.g., "image_a")
+   */
+  selectedOptionId?: string | null;
+  /**
+   * For 4_image type, tracking re-selections before final submission
+   */
+  reselectionEvents?:
+    | {
+        /**
+         * Duration from questionDisplayedAt to this re-selection
+         */
+        timestampMs: number;
+        /**
+         * The image ID selected at this event
+         */
+        selectedOptionId: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * For form type, key-value pairs of form input data
+   */
+  formData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Client-side timestamp when response was submitted
+   */
+  clientTimestamp?: string | null;
+  /**
+   * Server-side timestamp when response was received
+   */
+  serverTimestamp?: string | null;
+  /**
+   * Quality metrics for the response
+   */
+  responseQuality?: {
+    /**
+     * Whether this response meets quality criteria
+     */
+    isValid?: boolean | null;
+    /**
+     * Quality score (0-100) based on response patterns
+     */
+    qualityScore?: number | null;
+    /**
+     * Notes about response quality or anomalies
+     */
+    qualityNotes?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -926,6 +1291,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'surveys';
+        value: number | Survey;
+      } | null)
+    | ({
+        relationTo: 'questions';
+        value: number | Question;
+      } | null)
+    | ({
+        relationTo: 'participants';
+        value: number | Participant;
+      } | null)
+    | ({
+        relationTo: 'responses';
+        value: number | Response;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1290,6 +1671,119 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "surveys_select".
+ */
+export interface SurveysSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  slug?: T;
+  slugLock?: T;
+  instructions?: T;
+  thankYouMessage?: T;
+  defaultCountdownSeconds?: T;
+  questions?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "questions_select".
+ */
+export interface QuestionsSelect<T extends boolean = true> {
+  title?: T;
+  type?: T;
+  order?: T;
+  overrideInstructions?: T;
+  countdownSeconds?: T;
+  images?:
+    | T
+    | {
+        id?: T;
+        image?: T;
+        label?: T;
+      };
+  formElements?:
+    | T
+    | {
+        type?: T;
+        name?: T;
+        label?: T;
+        placeholder?: T;
+        defaultValue?: T;
+        required?: T;
+        options?:
+          | T
+          | {
+              label?: T;
+              value?: T;
+              id?: T;
+            };
+        validation?:
+          | T
+          | {
+              minLength?: T;
+              maxLength?: T;
+              min?: T;
+              max?: T;
+              pattern?: T;
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "participants_select".
+ */
+export interface ParticipantsSelect<T extends boolean = true> {
+  participantId?: T;
+  uniqueLinkToken?: T;
+  currentSurvey?: T;
+  lastCompletedQuestion?: T;
+  status?: T;
+  metadata?: T;
+  startedAt?: T;
+  completedAt?: T;
+  totalTimeMs?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "responses_select".
+ */
+export interface ResponsesSelect<T extends boolean = true> {
+  participant?: T;
+  survey?: T;
+  question?: T;
+  questionDisplayedAt?: T;
+  initialSelectionTimeMs?: T;
+  finalSelectionTimeMs?: T;
+  selectedOptionId?: T;
+  reselectionEvents?:
+    | T
+    | {
+        timestampMs?: T;
+        selectedOptionId?: T;
+        id?: T;
+      };
+  formData?: T;
+  clientTimestamp?: T;
+  serverTimestamp?: T;
+  responseQuality?:
+    | T
+    | {
+        isValid?: T;
+        qualityScore?: T;
+        qualityNotes?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
