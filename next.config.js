@@ -19,6 +19,8 @@ const nextConfig = {
         }
       }),
     ],
+    // Allow local images from the media directory
+    domains: ['localhost'],
   },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {

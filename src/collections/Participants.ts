@@ -36,14 +36,35 @@ export const Participants: CollectionConfig = {
       },
     },
     {
-      name: 'uniqueLinkToken',
-      type: 'text',
-      required: true,
-      unique: true,
-      admin: {
-        description: 'Secure, unique token for generating access links',
-        readOnly: true,
-      },
+      type: 'row',
+      fields: [
+        {
+          name: 'uniqueLinkToken',
+          type: 'text',
+          required: true,
+          unique: true,
+          admin: {
+            description:
+              'Secure, unique token for generating access links, will be automatically generated after saving the participant',
+            readOnly: true,
+          },
+        },
+        {
+          name: 'copyLink',
+          type: 'ui',
+          admin: {
+            components: {
+              Field: {
+                path: '@/components/CopyLinkField/CopyLinkComponent#CopyLinkComponent',
+                clientProps: {
+                  surveyFieldPath: 'currentSurvey',
+                  tokenFieldPath: 'uniqueLinkToken',
+                },
+              },
+            },
+          },
+        },
+      ],
     },
     {
       name: 'currentSurvey',

@@ -965,7 +965,7 @@ export interface Participant {
    */
   participantId: string;
   /**
-   * Secure, unique token for generating access links
+   * Secure, unique token for generating access links, will be automatically generated after saving the participant
    */
   uniqueLinkToken: string;
   /**
