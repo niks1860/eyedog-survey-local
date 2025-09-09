@@ -1,7 +1,13 @@
+import { randomUUID } from 'node:crypto'
+import { Media } from '@/payload-types'
 import type { Payload } from 'payload'
 
+interface Data {
+  images: Media[]
+}
+
 // Simple survey seed data that works with Payload CMS
-export const createSurveySeedData = async (payload: Payload) => {
+export const createSurveySeedData = async (payload: Payload, { images }: Data) => {
   try {
     // Create first survey
     const survey1 = await payload.create({
@@ -213,8 +219,11 @@ export const createSurveySeedData = async (payload: Payload) => {
           type: '4_image',
           order: i,
           countdownSeconds: 3,
-          // Note: Images will need to be added manually through the admin interface
-          // or by updating these questions after media is available
+          images: images.slice(0, 4).map((image, i) => ({
+            id: `${image.id}-${randomUUID()}`,
+            image: image.id,
+            label: `Option ${i + 1}`,
+          })),
         },
       })
       questions1.push(question)
@@ -231,8 +240,11 @@ export const createSurveySeedData = async (payload: Payload) => {
           type: '4_image',
           order: i,
           countdownSeconds: 5,
-          // Note: Images will need to be added manually through the admin interface
-          // or by updating these questions after media is available
+          images: images.slice(0, 4).map((image, i) => ({
+            id: `${image.id}-${randomUUID()}`,
+            image: image.id,
+            label: `Option ${i + 1}`,
+          })),
         },
       })
       questions2.push(question)
